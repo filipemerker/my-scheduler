@@ -22,6 +22,7 @@ model Draft {
   content         String
   mediaUrl        String?
   userId          String?
+  order           Int
   createdAt       DateTime        @default(now())
   scheduledPosts  ScheduledPost[]
 }
