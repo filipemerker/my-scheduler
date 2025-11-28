@@ -1,0 +1,40 @@
+// Prisma schema for MongoDB
+// learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+}
+
+// Enum for post status
+enum PostStatus {
+  SCHEDULED
+  PUBLISHED
+  CANCELLED
+}
+
+// Draft model - stores content drafts
+model Draft {
+  id              String          @id @default(auto()) @map("_id") @db.ObjectId
+  content         String
+  mediaUrl        String?
+  userId          String?
+  createdAt       DateTime        @default(now())
+  scheduledPosts  ScheduledPost[]
+}
+
+// ScheduledPost model - represents posts scheduled for publishing
+model ScheduledPost {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  draftId      String     @db.ObjectId
+  draft        Draft      @relation(fields: [draftId], references: [id])
+  scheduledAt  DateTime
+  status       PostStatus @default(SCHEDULED)
+  publishedAt  DateTime?
+  createdAt    DateTime   @default(now())
+
+  @@index([scheduledAt])
+}
