@@ -1,0 +1,23 @@
+.field {
+  flex: 1;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  outline: 2px solid #646cff;
+  outline-offset: 2px;
+}
