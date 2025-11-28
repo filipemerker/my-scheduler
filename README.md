@@ -15,4 +15,4 @@ A minimal monorepo demonstrating GraphQL client-server integration with Apollo S
 
 Se tthe foundation up, spun up Apollo Server and a React client that talks to it, then wired in Prisma with MongoDB. Created the basic Draft and ScheduledPost models to store content and scheduling info.
 
-<img src="iterations/iteration--1.png" width="600" alt="Iteration 1" />
+<img src="iterations/iteration---1.png" width="700" alt="Iteration 1" />
