@@ -1,4 +1,5 @@
 .card {
+  position: relative;
   background: white;
   padding: var(--space-4);
   border-radius: var(--radius-2);
@@ -8,4 +9,17 @@
 
 .card:hover {
   border-color: var(--gray-8);
+}
+
+.menuWrapper {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.card:hover .menuWrapper,
+.menuOpen {
+  opacity: 1;
 }

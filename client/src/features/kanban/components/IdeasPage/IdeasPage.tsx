@@ -1,21 +1,16 @@
-import { useQuery, useMutation } from "@apollo/client/react";
+import { useState } from "react";
+import { useQuery } from "@apollo/client/react";
 import * as Separator from "@radix-ui/react-separator";
 import { Plus } from "lucide-react";
 import { GET_KANBAN } from "../../api/queries";
-import { CREATE_SWIMLANE } from "../../api/mutations";
-import type { GetKanbanData, CreateSwimlaneData } from "../../types";
+import type { GetKanbanData } from "../../types";
 import { Swimlane } from "../Swimlane/Swimlane";
+import { SwimlaneCreateModal } from "./SwimlaneCreate.modal";
 import styles from "./IdeasPage.module.css";
 
 export function IdeasPage() {
   const { data, loading } = useQuery<GetKanbanData>(GET_KANBAN);
-  const [createSwimlane] = useMutation<CreateSwimlaneData>(CREATE_SWIMLANE, {
-    refetchQueries: [{ query: GET_KANBAN }],
-  });
-
-  const handleNewGroup = () => {
-    createSwimlane({ variables: { name: "New Group" } });
-  };
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   if (loading) return <p className={styles.loading}>Loading...</p>;
 
@@ -34,11 +29,19 @@ export function IdeasPage() {
           <Swimlane key={swimlane.id} swimlane={swimlane} />
         ))}
 
-        <button className={styles.addColumnButton} onClick={handleNewGroup}>
+        <button
+          className={styles.addColumnButton}
+          onClick={() => setCreateDialogOpen(true)}
+        >
           <Plus size={18} />
           New Group
         </button>
       </div>
+
+      <SwimlaneCreateModal
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+      />
     </div>
   );
 }

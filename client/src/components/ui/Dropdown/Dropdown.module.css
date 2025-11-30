@@ -1,0 +1,13 @@
+:global(.dropdown-content) {
+  border-radius: var(--radius-2);
+  min-width: 180px;
+  font-weight: 600;
+}
+
+:global(.dropdown-content [data-radix-collection-item]) {
+  cursor: pointer;
+}
+
+:global(.dropdown-content [role="separator"]) {
+  margin: var(--space-2) 0;
+}

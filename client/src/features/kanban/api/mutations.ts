@@ -12,7 +12,11 @@ export const CREATE_SWIMLANE = gql`
 
 export const CREATE_IDEA = gql`
   mutation CreateIdea($name: String!, $description: String, $swimlaneId: ID!) {
-    createIdea(name: $name, description: $description, swimlaneId: $swimlaneId) {
+    createIdea(
+      name: $name
+      description: $description
+      swimlaneId: $swimlaneId
+    ) {
       id
       name
       description
@@ -33,3 +37,21 @@ export const DELETE_SWIMLANE = gql`
   }
 `;
 
+export const UPDATE_SWIMLANE = gql`
+  mutation UpdateSwimlane($id: ID!, $name: String) {
+    updateSwimlane(id: $id, name: $name) {
+      id
+      name
+    }
+  }
+`;
+
+export const UPDATE_IDEA = gql`
+  mutation UpdateIdea($id: ID!, $name: String, $description: String) {
+    updateIdea(id: $id, name: $name, description: $description) {
+      id
+      name
+      description
+    }
+  }
+`;

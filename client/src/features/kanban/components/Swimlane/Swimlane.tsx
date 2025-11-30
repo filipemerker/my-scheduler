@@ -1,12 +1,18 @@
 import { useState } from "react";
-import { useMutation } from "@apollo/client/react";
-import * as Dialog from "@radix-ui/react-dialog";
-import { IconButton, TextField, Button, Flex } from "@radix-ui/themes";
-import { Plus } from "lucide-react";
-import { CREATE_IDEA } from "../../api/mutations";
-import { GET_KANBAN } from "../../api/queries";
-import type { Swimlane as SwimlaneType, CreateIdeaData } from "../../types";
+import { IconButton, Button } from "@radix-ui/themes";
+import { Plus, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownContent,
+  DropdownItem,
+  DropdownSeparator,
+} from "../../../../components/ui/Dropdown";
+import type { Swimlane as SwimlaneType } from "../../types";
 import { IdeaCard } from "../IdeaCard/IdeaCard";
+import { IdeaCreateModal } from "./IdeaCreate.modal";
+import { SwimlaneEditModal } from "./SwimlaneEdit.modal";
+import { SwimlaneDeleteModal } from "./SwimlaneDelete.modal";
 import styles from "./Swimlane.module.css";
 
 interface SwimlaneProps {
@@ -14,56 +20,65 @@ interface SwimlaneProps {
 }
 
 export function Swimlane({ swimlane }: SwimlaneProps) {
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState("");
-
-  const [createIdea] = useMutation<CreateIdeaData>(CREATE_IDEA, {
-    refetchQueries: [{ query: GET_KANBAN }],
-    onCompleted: () => {
-      setName("");
-      setOpen(false);
-    },
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) return;
-    createIdea({ variables: { name, swimlaneId: swimlane.id } });
-  };
+  const [ideaDialogOpen, setIdeaDialogOpen] = useState(false);
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   return (
     <div className={styles.swimlane}>
       <div className={styles.header}>
         <span className={styles.title}>{swimlane.name}</span>
 
-        <Dialog.Root open={open} onOpenChange={setOpen}>
-          <Dialog.Trigger asChild>
+        <IconButton
+          variant="ghost"
+          color="gray"
+          size="1"
+          onClick={() => setIdeaDialogOpen(true)}
+        >
+          <Plus size={18} />
+        </IconButton>
+
+        <Dropdown>
+          <DropdownTrigger>
             <IconButton variant="ghost" color="gray" size="1">
-              <Plus size={18} />
+              <MoreHorizontal size={18} />
             </IconButton>
-          </Dialog.Trigger>
+          </DropdownTrigger>
+          <DropdownContent>
+            <DropdownItem onSelect={() => setRenameDialogOpen(true)}>
+              <Pencil size={14} />
+              Rename
+            </DropdownItem>
+            <DropdownSeparator />
+            <DropdownItem
+              color="red"
+              onSelect={() => setDeleteDialogOpen(true)}
+            >
+              <Trash2 size={14} />
+              Delete
+            </DropdownItem>
+          </DropdownContent>
+        </Dropdown>
 
-          <Dialog.Overlay className={styles.overlay} />
+        <SwimlaneEditModal
+          open={renameDialogOpen}
+          onOpenChange={setRenameDialogOpen}
+          swimlaneId={swimlane.id}
+          currentName={swimlane.name}
+        />
 
-          <Dialog.Content className={styles.dialog}>
-            <Dialog.Title className={styles.dialogTitle}>New Idea</Dialog.Title>
-            <form onSubmit={handleSubmit}>
-              <Flex gap="2">
-                <TextField.Root
-                  style={{ flex: 1 }}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Idea name..."
-                  autoFocus
-                />
+        <SwimlaneDeleteModal
+          open={deleteDialogOpen}
+          onOpenChange={setDeleteDialogOpen}
+          swimlaneId={swimlane.id}
+          swimlaneName={swimlane.name}
+        />
 
-                <Button type="submit" disabled={!name.trim()}>
-                  Add
-                </Button>
-              </Flex>
-            </form>
-          </Dialog.Content>
-        </Dialog.Root>
+        <IdeaCreateModal
+          open={ideaDialogOpen}
+          onOpenChange={setIdeaDialogOpen}
+          swimlaneId={swimlane.id}
+        />
       </div>
 
       <div className={styles.ideas}>
@@ -75,7 +90,7 @@ export function Swimlane({ swimlane }: SwimlaneProps) {
           className={styles.newIdeaButton}
           variant="ghost"
           color="gray"
-          onClick={() => setOpen(true)}
+          onClick={() => setIdeaDialogOpen(true)}
         >
           <Plus size={16} />
           New Idea
