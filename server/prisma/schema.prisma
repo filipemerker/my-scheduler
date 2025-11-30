@@ -10,33 +10,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Enum for post status
-enum PostStatus {
-  SCHEDULED
-  PUBLISHED
-  CANCELLED
+// Kanban board - stores the order of swimlanes
+model Kanban {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  swimlaneOrder  String[] @db.ObjectId
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
-// Draft model - stores content drafts
-model Draft {
-  id              String          @id @default(auto()) @map("_id") @db.ObjectId
-  content         String
-  mediaUrl        String?
-  userId          String?
-  order           Int
-  createdAt       DateTime        @default(now())
-  scheduledPosts  ScheduledPost[]
+// Swimlane - a column in the kanban board
+model Swimlane {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  ideaItemOrder String[] @db.ObjectId
+  ideas         Idea[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
-// ScheduledPost model - represents posts scheduled for publishing
-model ScheduledPost {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
-  draftId      String     @db.ObjectId
-  draft        Draft      @relation(fields: [draftId], references: [id])
-  scheduledAt  DateTime
-  status       PostStatus @default(SCHEDULED)
-  publishedAt  DateTime?
-  createdAt    DateTime   @default(now())
-
-  @@index([scheduledAt])
+// Idea - an item within a swimlane
+model Idea {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  swimlaneId  String   @db.ObjectId
+  swimlane    Swimlane @relation(fields: [swimlaneId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
