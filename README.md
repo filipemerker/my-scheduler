@@ -33,4 +33,4 @@ Pivoted the app to a Kanban-style ideas board, similar to what is live on Buffer
 
 Added full CRUD for swimlanes and ideas with proper modals. Created shared UI components (Dialog, Dropdown) for consistency.
 
-<img src="iterations/iteration---4.png" width="700" alt="Iteration 4" />
+<img src="iterations/iteration---4.1.png.png" width="700" alt="Iteration 4" />
