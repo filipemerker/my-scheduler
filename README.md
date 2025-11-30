@@ -28,3 +28,9 @@ Removed the old scaffolding and built out the real Draft CRUD. Added GraphQL que
 Pivoted the app to a Kanban-style ideas board, similar to what is live on Buffer. Replaced the db schema with Kanban, Swimlane, and Idea models. Refactored the server to make it a bit more modular. Then started adding the board UI.
 
 <img src="iterations/iteration---3.png" width="700" alt="Iteration 3" />
+
+### Iteration 4
+
+Added full CRUD for swimlanes and ideas with proper modals. Created shared UI components (Dialog, Dropdown) for consistency.
+
+<img src="iterations/iteration---4.png" width="700" alt="Iteration 4" />
