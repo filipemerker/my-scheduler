@@ -34,3 +34,9 @@ Pivoted the app to a Kanban-style ideas board, similar to what is live on Buffer
 Added full CRUD for swimlanes and ideas with proper modals. Created shared UI components (Dialog, Dropdown) for consistency.
 
 <img src="iterations/iteration---4.1.png" width="700" alt="Iteration 4" />
+
+### Iteration 5
+
+Added basic drag and drop features with dnd-kit. Also, created a local kanban state specifically for sorting to solve async dnd issues.
+
+<img src="iterations/iteration---5.png" width="700" alt="Iteration 5" />
