@@ -1,12 +1,7 @@
-import { Sidebar } from "./features/drafts/components/Sidebar/Sidebar";
-import styles from "./App.module.css";
+import { IdeasPage } from "./features/kanban/components/IdeasPage/IdeasPage";
 
 function App() {
-  return (
-    <div className={styles.app}>
-      <Sidebar />
-    </div>
-  );
+  return <IdeasPage />;
 }
 
 export default App;
