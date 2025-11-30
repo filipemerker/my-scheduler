@@ -12,6 +12,6 @@
     "resolveJsonModule": true,
     "moduleResolution": "node"
   },
-  "include": ["src/**/*", "api/**/*"],
+  "include": ["src/**/*", "netlify/**/*"],
   "exclude": ["node_modules", "dist"]
 }

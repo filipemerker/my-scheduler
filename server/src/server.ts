@@ -5,5 +5,5 @@ import { kanbanResolvers } from "./modules/kanban/kanban.resolvers";
 export const server = new ApolloServer({
   typeDefs: [kanbanTypeDefs],
   resolvers: [kanbanResolvers],
+  introspection: true,
 });
-

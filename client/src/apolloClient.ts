@@ -1,7 +1,9 @@
-import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import { ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
 
 const httpLink = new HttpLink({
-  uri: import.meta.env.VITE_GRAPHQL_URL || 'http://localhost:4000/graphql',
+  uri:
+    import.meta.env.VITE_GRAPHQL_URL ||
+    "https://myscheduler-filipe.netlify.app/api/graphql",
 });
 
 const client = new ApolloClient({
@@ -10,4 +12,3 @@ const client = new ApolloClient({
 });
 
 export default client;
-
