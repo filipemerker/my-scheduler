@@ -25,7 +25,7 @@ export function IdeaCreateModal({
 }: IdeaCreateModalProps) {
   const [name, setName] = useState("");
 
-  const [createIdea] = useMutation(CREATE_IDEA, {
+  const [createIdea, { loading }] = useMutation(CREATE_IDEA, {
     refetchQueries: [{ query: GET_KANBAN }],
     onCompleted: () => {
       setName("");
@@ -35,7 +35,7 @@ export function IdeaCreateModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!name.trim() || loading) return;
     createIdea({ variables: { name, swimlaneId } });
   };
 
@@ -60,16 +60,22 @@ export function IdeaCreateModal({
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter idea name..."
               autoFocus
+              disabled={loading}
             />
           </Flex>
 
           <Flex gap="3" justify="end">
             <DialogClose asChild>
-              <Button variant="soft" color="gray">
+              <Button variant="soft" color="gray" disabled={loading}>
                 Cancel
               </Button>
             </DialogClose>
-            <Button color="indigo" type="submit" disabled={!name.trim()}>
+            <Button
+              color="indigo"
+              type="submit"
+              disabled={!name.trim() || loading}
+              loading={loading}
+            >
               Create
             </Button>
           </Flex>

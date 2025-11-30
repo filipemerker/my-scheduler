@@ -28,6 +28,7 @@ export function Swimlane({ swimlane }: SwimlaneProps) {
     <div className={styles.swimlane}>
       <div className={styles.header}>
         <span className={styles.title}>{swimlane.name}</span>
+        <span className={styles.count}>{swimlane.ideas.length}</span>
 
         <IconButton
           variant="ghost"

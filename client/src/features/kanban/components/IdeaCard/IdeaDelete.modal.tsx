@@ -23,12 +23,13 @@ export function IdeaDeleteModal({
   ideaId,
   ideaName,
 }: IdeaDeleteModalProps) {
-  const [deleteIdea] = useMutation(DELETE_IDEA, {
+  const [deleteIdea, { loading }] = useMutation(DELETE_IDEA, {
     refetchQueries: [{ query: GET_KANBAN }],
     onCompleted: () => onOpenChange(false),
   });
 
   const handleDelete = () => {
+    if (loading) return;
     deleteIdea({ variables: { id: ideaId } });
   };
 
@@ -41,12 +42,12 @@ export function IdeaDeleteModal({
         </AlertDialogDescription>
         <Flex gap="3" mt="4" justify="end">
           <AlertDialogPrimitive.Cancel asChild>
-            <Button variant="soft" color="gray">
+            <Button variant="soft" color="gray" disabled={loading}>
               Cancel
             </Button>
           </AlertDialogPrimitive.Cancel>
           <AlertDialogPrimitive.Action asChild>
-            <Button color="red" onClick={handleDelete}>
+            <Button color="red" onClick={handleDelete} loading={loading}>
               Delete
             </Button>
           </AlertDialogPrimitive.Action>
@@ -55,4 +56,3 @@ export function IdeaDeleteModal({
     </AlertDialog>
   );
 }
-

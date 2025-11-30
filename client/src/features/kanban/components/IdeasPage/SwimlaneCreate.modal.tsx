@@ -23,7 +23,7 @@ export function SwimlaneCreateModal({
 }: SwimlaneCreateModalProps) {
   const [name, setName] = useState("");
 
-  const [createSwimlane] = useMutation(CREATE_SWIMLANE, {
+  const [createSwimlane, { loading }] = useMutation(CREATE_SWIMLANE, {
     refetchQueries: [{ query: GET_KANBAN }],
     onCompleted: () => {
       setName("");
@@ -33,7 +33,7 @@ export function SwimlaneCreateModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!name.trim() || loading) return;
     createSwimlane({ variables: { name } });
   };
 
@@ -58,16 +58,22 @@ export function SwimlaneCreateModal({
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter group name..."
               autoFocus
+              disabled={loading}
             />
           </Flex>
 
           <Flex gap="3" justify="end">
             <DialogClose asChild>
-              <Button variant="soft" color="gray">
+              <Button variant="soft" color="gray" disabled={loading}>
                 Cancel
               </Button>
             </DialogClose>
-            <Button color="indigo" type="submit" disabled={!name.trim()}>
+            <Button
+              color="indigo"
+              type="submit"
+              disabled={!name.trim() || loading}
+              loading={loading}
+            >
               Create
             </Button>
           </Flex>

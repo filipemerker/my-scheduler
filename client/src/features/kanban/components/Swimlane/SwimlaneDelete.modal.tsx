@@ -24,12 +24,13 @@ export function SwimlaneDeleteModal({
   swimlaneId,
   swimlaneName,
 }: SwimlaneDeleteModalProps) {
-  const [deleteSwimlane] = useMutation(DELETE_SWIMLANE, {
+  const [deleteSwimlane, { loading }] = useMutation(DELETE_SWIMLANE, {
     refetchQueries: [{ query: GET_KANBAN }],
     onCompleted: () => onOpenChange(false),
   });
 
   const handleDelete = () => {
+    if (loading) return;
     deleteSwimlane({ variables: { id: swimlaneId } });
   };
 
@@ -43,12 +44,12 @@ export function SwimlaneDeleteModal({
         </AlertDialogDescription>
         <Flex gap="3" justify="end">
           <AlertDialogCancel asChild>
-            <Button variant="soft" color="gray">
+            <Button variant="soft" color="gray" disabled={loading}>
               Cancel
             </Button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
-            <Button color="red" onClick={handleDelete}>
+            <Button color="red" onClick={handleDelete} loading={loading}>
               Delete
             </Button>
           </AlertDialogAction>

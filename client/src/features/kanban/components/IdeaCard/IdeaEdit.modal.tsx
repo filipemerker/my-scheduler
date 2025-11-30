@@ -31,14 +31,14 @@ export function IdeaEditModal({
     if (open) setName(currentName);
   }, [open, currentName]);
 
-  const [updateIdea] = useMutation(UPDATE_IDEA, {
+  const [updateIdea, { loading }] = useMutation(UPDATE_IDEA, {
     refetchQueries: [{ query: GET_KANBAN }],
     onCompleted: () => onOpenChange(false),
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || name === currentName) return;
+    if (!name.trim() || name === currentName || loading) return;
     updateIdea({ variables: { id: ideaId, name } });
   };
 
@@ -47,9 +47,7 @@ export function IdeaEditModal({
       <DialogOverlay />
       <DialogContent>
         <DialogTitle>Rename Idea</DialogTitle>
-        <DialogDescription>
-          Update the name of this idea.
-        </DialogDescription>
+        <DialogDescription>Update the name of this idea.</DialogDescription>
 
         <form onSubmit={handleSubmit}>
           <Flex direction="column" gap="2" mb="4">
@@ -63,19 +61,21 @@ export function IdeaEditModal({
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter idea name..."
               autoFocus
+              disabled={loading}
             />
           </Flex>
 
           <Flex gap="3" justify="end">
             <DialogClose asChild>
-              <Button variant="soft" color="gray">
+              <Button variant="soft" color="gray" disabled={loading}>
                 Cancel
               </Button>
             </DialogClose>
             <Button
               color="indigo"
               type="submit"
-              disabled={!name.trim() || name === currentName}
+              disabled={!name.trim() || name === currentName || loading}
+              loading={loading}
             >
               Save
             </Button>
@@ -85,4 +85,3 @@ export function IdeaEditModal({
     </Dialog>
   );
 }
-
