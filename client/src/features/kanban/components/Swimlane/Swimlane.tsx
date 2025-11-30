@@ -1,6 +1,14 @@
 import { useState } from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { IconButton, Button } from "@radix-ui/themes";
-import { Plus, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import {
+  Plus,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  GripHorizontalIcon,
+} from "lucide-react";
 import {
   Dropdown,
   DropdownTrigger,
@@ -17,16 +25,48 @@ import styles from "./Swimlane.module.css";
 
 interface SwimlaneProps {
   swimlane: SwimlaneType;
+  isPlaceholder?: boolean;
+  isDragOverlay?: boolean;
+  isAnyDragging?: boolean;
 }
 
-export function Swimlane({ swimlane }: SwimlaneProps) {
+export function Swimlane({
+  swimlane,
+  isPlaceholder = false,
+  isDragOverlay = false,
+  isAnyDragging = false,
+}: SwimlaneProps) {
   const [ideaDialogOpen, setIdeaDialogOpen] = useState(false);
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: swimlane.id, disabled: isDragOverlay });
+
+  // Only apply transition while any drag is active, not after drop
+  const style = isDragOverlay
+    ? undefined
+    : {
+        transform: CSS.Transform.toString(transform),
+        transition: isAnyDragging ? transition : undefined,
+      };
+
+  if (isPlaceholder) {
+    return (
+      <div ref={setNodeRef} style={style} className={styles.placeholder} />
+    );
+  }
+
+  const classNames = [styles.swimlane];
+  if (isDragOverlay) classNames.push(styles.dragOverlay);
+
   return (
-    <div className={styles.swimlane}>
-      <div className={styles.header}>
+    <div ref={setNodeRef} style={style} className={classNames.join(" ")}>
+      <div className={styles.header} {...attributes} {...listeners}>
+        <div className={styles.dragHandle}>
+          <GripHorizontalIcon size={16} />
+        </div>
+
         <span className={styles.title}>{swimlane.name}</span>
         <span className={styles.count}>{swimlane.ideas.length}</span>
 
@@ -34,14 +74,23 @@ export function Swimlane({ swimlane }: SwimlaneProps) {
           variant="ghost"
           color="gray"
           size="1"
-          onClick={() => setIdeaDialogOpen(true)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIdeaDialogOpen(true);
+          }}
+          onPointerDown={(e) => e.stopPropagation()}
         >
           <Plus size={18} />
         </IconButton>
 
         <Dropdown>
           <DropdownTrigger>
-            <IconButton variant="ghost" color="gray" size="1">
+            <IconButton
+              variant="ghost"
+              color="gray"
+              size="1"
+              onPointerDown={(e) => e.stopPropagation()}
+            >
               <MoreHorizontal size={18} />
             </IconButton>
           </DropdownTrigger>

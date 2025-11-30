@@ -8,11 +8,54 @@
   height: calc(100vh - 100px);
 }
 
+/* Placeholder shown where the dragged item came from */
+.placeholder {
+  background: var(--indigo-3);
+  border: 2px dashed var(--indigo-6);
+  border-radius: var(--radius-3);
+  min-width: 320px;
+  max-width: 320px;
+  height: calc(100vh - 100px);
+  opacity: 0.6;
+}
+
+/* The actual dragged overlay */
+.dragOverlay {
+  transform: rotate(3deg);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  cursor: grabbing;
+}
+
+.dragOverlay .dragHandle {
+  opacity: 1;
+}
+
 .header {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-4);
+  padding: var(--space-5) var(--space-4);
+  cursor: grab;
+  position: relative;
+}
+
+.header:active {
+  cursor: grabbing;
+}
+
+.dragHandle {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--gray-12);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.swimlane:hover .dragHandle {
+  opacity: 1;
 }
 
 .title {

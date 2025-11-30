@@ -55,3 +55,12 @@ export const UPDATE_IDEA = gql`
     }
   }
 `;
+
+export const UPDATE_SWIMLANE_ORDER = gql`
+  mutation UpdateSwimlaneOrder($swimlaneOrder: [ID!]!) {
+    updateSwimlaneOrder(swimlaneOrder: $swimlaneOrder) {
+      id
+      swimlaneOrder
+    }
+  }
+`;
