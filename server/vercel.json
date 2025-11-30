@@ -1,12 +1,8 @@
 {
-  "buildCommand": "npm install && npm run db:generate",
-  "outputDirectory": ".",
   "functions": {
     "api/graphql.ts": {
       "memory": 1024,
       "maxDuration": 10
     }
-  },
-  "installCommand": "npm install"
+  }
 }
-
