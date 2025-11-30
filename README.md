@@ -46,3 +46,9 @@ Added basic drag and drop features with dnd-kit. Also, created a local kanban st
 Implemented cross-lane sorting and refactored the `useIdeaReorder` hook to drastically simplify remapping logic.
 
 <img src="iterations/iteration---6.png" width="700" alt="Iteration 6" />
+
+### Iteration 7
+
+Add final minor fixes and implement skelleton loader.
+
+<img src="iterations/iteration---7.png" width="700" alt="Iteration 7" />
