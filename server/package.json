@@ -16,6 +16,7 @@
   "dependencies": {
     "@apollo/server": "^5.2.0",
     "@prisma/client": "^5.22.0",
+    "@vercel/node": "^3.2.29",
     "body-parser": "^2.2.1",
     "cors": "^2.8.5",
     "graphql": "^16.12.0",
