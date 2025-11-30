@@ -28,6 +28,7 @@ import { useIdeaReorder } from "../../hooks/useIdeaReorder";
 import { Swimlane } from "../Swimlane/Swimlane";
 import { IdeaCardPreview } from "../IdeaCard/IdeaCard";
 import { SwimlaneCreateModal } from "./SwimlaneCreate.modal";
+import { KanbanSkeleton } from "../Skeleton";
 import styles from "./IdeasPage.module.css";
 
 const dropAnimation: DropAnimation = {
@@ -102,7 +103,19 @@ export function IdeasPage() {
     if (type === "idea") ideaDragEnd(event);
   };
 
-  if (loading || !kanban) return <p className={styles.loading}>Loading...</p>;
+  if (loading || !kanban) {
+    return (
+      <div className={styles.page}>
+        <header className={styles.header}>
+          <h1 className={styles.title}>Ideas</h1>
+        </header>
+
+        <Separator.Root className={styles.separator} />
+
+        <KanbanSkeleton />
+      </div>
+    );
+  }
 
   const swimlanes = kanban.swimlanes;
   const swimlaneIds = swimlanes.map((s) => s.id);

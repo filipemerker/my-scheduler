@@ -30,11 +30,6 @@
   align-items: flex-start;
 }
 
-.loading {
-  padding: var(--space-5);
-  color: var(--gray-11);
-}
-
 .addColumnButton {
   background: transparent;
   border: none;

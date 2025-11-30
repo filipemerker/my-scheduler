@@ -3,7 +3,6 @@ import { useMutation } from "@apollo/client/react";
 import { TextField, Button, Flex, Text } from "@radix-ui/themes";
 import {
   Dialog,
-  DialogOverlay,
   DialogContent,
   DialogTitle,
   DialogDescription,
@@ -39,7 +38,6 @@ export function SwimlaneCreateModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogOverlay />
       <DialogContent>
         <DialogTitle>New Group</DialogTitle>
         <DialogDescription>

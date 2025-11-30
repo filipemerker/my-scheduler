@@ -8,15 +8,14 @@ export const Dialog = DialogPrimitive.Root;
 export const DialogTrigger = DialogPrimitive.Trigger;
 export const DialogClose = DialogPrimitive.Close;
 
-export function DialogOverlay() {
-  return <DialogPrimitive.Overlay className={styles.overlay} />;
-}
-
 export function DialogContent({ children }: { children: React.ReactNode }) {
   return (
-    <DialogPrimitive.Content className={styles.content}>
-      <Theme>{children}</Theme>
-    </DialogPrimitive.Content>
+    <DialogPrimitive.Portal>
+      <DialogPrimitive.Overlay className={styles.overlay} />
+      <DialogPrimitive.Content className={styles.content}>
+        <Theme>{children}</Theme>
+      </DialogPrimitive.Content>
+    </DialogPrimitive.Portal>
   );
 }
 

@@ -2,7 +2,6 @@ export {
   Dialog,
   DialogTrigger,
   DialogClose,
-  DialogOverlay,
   DialogContent,
   DialogTitle,
   DialogDescription,
