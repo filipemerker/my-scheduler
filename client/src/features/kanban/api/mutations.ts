@@ -64,3 +64,25 @@ export const UPDATE_SWIMLANE_ORDER = gql`
     }
   }
 `;
+
+export const UPDATE_IDEA_ORDER = gql`
+  mutation UpdateIdeaOrder($swimlaneId: ID!, $ideaItemOrder: [ID!]!) {
+    updateIdeaOrder(swimlaneId: $swimlaneId, ideaItemOrder: $ideaItemOrder) {
+      id
+      ideaItemOrder
+    }
+  }
+`;
+
+export const MOVE_IDEA = gql`
+  mutation MoveIdea($id: ID!, $targetSwimlaneId: ID!, $newIndex: Int!) {
+    moveIdea(
+      id: $id
+      targetSwimlaneId: $targetSwimlaneId
+      newIndex: $newIndex
+    ) {
+      id
+      swimlaneId
+    }
+  }
+`;

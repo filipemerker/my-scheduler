@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useSortable } from "@dnd-kit/sortable";
+import { useSortable, SortableContext } from "@dnd-kit/sortable";
+import { verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { IconButton, Button } from "@radix-ui/themes";
 import {
@@ -41,7 +42,11 @@ export function Swimlane({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: swimlane.id, disabled: isDragOverlay });
+    useSortable({
+      id: swimlane.id,
+      disabled: isDragOverlay,
+      data: { type: "lane" },
+    });
 
   // Only apply transition while any drag is active, not after drop
   const style = isDragOverlay
@@ -132,9 +137,14 @@ export function Swimlane({
       </div>
 
       <div className={styles.ideas}>
-        {swimlane.ideas.map((idea) => (
-          <IdeaCard key={idea.id} idea={idea} />
-        ))}
+        <SortableContext
+          items={swimlane.ideas.map((idea) => idea.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          {swimlane.ideas.map((idea) => (
+            <IdeaCard key={idea.id} idea={idea} swimlaneId={swimlane.id} />
+          ))}
+        </SortableContext>
 
         <Button
           className={styles.newIdeaButton}

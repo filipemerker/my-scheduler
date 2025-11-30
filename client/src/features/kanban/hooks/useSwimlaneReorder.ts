@@ -2,46 +2,60 @@ import { useState } from "react";
 import { useMutation } from "@apollo/client/react";
 import { arrayMove } from "@dnd-kit/sortable";
 import type { DragStartEvent, DragEndEvent } from "@dnd-kit/core";
-import { GET_KANBAN } from "../api/queries";
 import { UPDATE_SWIMLANE_ORDER } from "../api/mutations";
-import type { GetKanbanData, Swimlane } from "../types";
+import type { Kanban } from "../types";
 
-export function useSwimlaneReorder(kanban: GetKanbanData["kanban"] | null) {
+interface UseSwimlaneReorderProps {
+  kanban: Kanban | null;
+  setKanban: (kanban: Kanban) => void;
+  startDragging: () => void;
+  stopDragging: () => void;
+  refetch: () => void;
+}
+
+export function useSwimlaneReorder({
+  kanban,
+  setKanban,
+  startDragging,
+  stopDragging,
+  refetch,
+}: UseSwimlaneReorderProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [updateSwimlaneOrder] = useMutation(UPDATE_SWIMLANE_ORDER);
 
-  const handleDragStart = (event: DragStartEvent) => {
+  const swimlaneDragStart = (event: DragStartEvent) => {
+    startDragging();
     setActiveId(event.active.id as string);
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const swimlaneDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    setActiveId(null);
 
-    if (!over || active.id === over.id || !kanban) return;
+    if (!over || active.id === over.id || !kanban) {
+      setActiveId(null);
+      stopDragging();
+      return;
+    }
 
     const oldIndex = kanban.swimlanes.findIndex((s) => s.id === active.id);
     const newIndex = kanban.swimlanes.findIndex((s) => s.id === over.id);
     const newOrder = arrayMove(kanban.swimlanes, oldIndex, newIndex);
 
-    // Optimistic cache update
+    // Update local state synchronously - this makes drop animation work!
+    setKanban({ ...kanban, swimlanes: newOrder });
+
+    setActiveId(null);
+
+    // Persist to server, only allow sync after mutation completes
     updateSwimlaneOrder({
       variables: { swimlaneOrder: newOrder.map((s) => s.id) },
-      optimisticResponse: {
-        updateSwimlaneOrder: {
-          __typename: "Kanban",
-          id: kanban.id,
-          swimlaneOrder: newOrder.map((s) => s.id),
-        },
-      },
-      update: (cache) => {
-        cache.writeQuery<GetKanbanData>({
-          query: GET_KANBAN,
-          data: { kanban: { ...kanban, swimlanes: newOrder } },
-        });
-      },
-    });
+    })
+      .then(() => stopDragging())
+      .catch(() => {
+        stopDragging();
+        refetch();
+      });
   };
 
-  return { activeId, handleDragStart, handleDragEnd };
+  return { activeId, swimlaneDragStart, swimlaneDragEnd };
 }

@@ -11,12 +11,10 @@
 /* Placeholder shown where the dragged item came from */
 .placeholder {
   background: var(--indigo-3);
-  border: 2px dashed var(--indigo-6);
   border-radius: var(--radius-3);
   min-width: 320px;
   max-width: 320px;
   height: calc(100vh - 100px);
-  opacity: 0.6;
 }
 
 /* The actual dragged overlay */

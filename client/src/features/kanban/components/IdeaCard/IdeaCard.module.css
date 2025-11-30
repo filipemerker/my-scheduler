@@ -4,11 +4,31 @@
   padding: var(--space-4);
   border-radius: var(--radius-2);
   border: 1px solid var(--gray-6);
-  transition: border-color 0.15s ease;
+  transition: transform 200ms ease, border-color 0.15s ease;
+  cursor: grab;
 }
 
 .card:hover {
   border-color: var(--gray-8);
+}
+
+.card[data-dnd-kit-dragging="true"] {
+  cursor: grabbing;
+}
+
+.placeholder {
+  background: var(--indigo-3);
+  border-color: transparent;
+}
+
+.placeholder * {
+  visibility: hidden;
+}
+
+.dragOverlay {
+  transform: rotate(3deg);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  cursor: grabbing;
 }
 
 .menuWrapper {
