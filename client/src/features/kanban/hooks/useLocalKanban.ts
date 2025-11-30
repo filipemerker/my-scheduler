@@ -5,7 +5,6 @@ export function useLocalKanban(serverKanban: Kanban | null | undefined) {
   const [localKanban, setLocalKanban] = useState<Kanban | null>(null);
   const isDraggingRef = useRef(false);
 
-  // Sync from server whenever it changes, unless actively dragging
   useEffect(() => {
     if (serverKanban && !isDraggingRef.current) {
       setLocalKanban(serverKanban);

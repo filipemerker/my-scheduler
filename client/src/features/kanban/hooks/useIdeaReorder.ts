@@ -1,17 +1,30 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useMutation } from "@apollo/client/react";
-import { arrayMove } from "@dnd-kit/sortable";
 import type {
   DragStartEvent,
   DragOverEvent,
   DragEndEvent,
 } from "@dnd-kit/core";
-import { UPDATE_IDEA_ORDER } from "../api/mutations";
+import { UPDATE_IDEA_ORDER, MOVE_IDEA } from "../api/mutations";
 import type { Kanban } from "../types";
+import {
+  getDragData,
+  getTargetLaneId,
+  findLaneById,
+  findLaneContainingIdea,
+  findIdeaIndex,
+  reorderIdeasInLane,
+  moveIdeaBetweenLanes,
+  isIdeaDrag,
+  isAlreadyInLane,
+  shouldSkipReorder,
+} from "./useIdeaReorder.utils";
 
 interface UseIdeaReorderProps {
   kanban: Kanban | null;
-  setKanban: (kanban: Kanban) => void;
+  setKanban: (
+    kanban: Kanban | ((prev: Kanban | null) => Kanban | null)
+  ) => void;
   startDragging: () => void;
   stopDragging: () => void;
   refetch: () => void;
@@ -25,74 +38,170 @@ export function useIdeaReorder({
   refetch,
 }: UseIdeaReorderProps) {
   const [updateIdeaOrder] = useMutation(UPDATE_IDEA_ORDER);
+  const [moveIdea] = useMutation(MOVE_IDEA);
   const [activeIdeaId, setActiveIdeaId] = useState<string | null>(null);
+  const sourceLaneIdRef = useRef<string | null>(null);
 
   const ideaDragStart = (event: DragStartEvent) => {
-    const data = event.active.data.current;
-    if (data?.type !== "idea") return;
+    const data = getDragData(event.active);
+    if (!isIdeaDrag(data)) return;
+
     startDragging();
     setActiveIdeaId(event.active.id as string);
+    sourceLaneIdRef.current = data!.swimlaneId!;
   };
 
-  const ideaDragOver = (_event: DragOverEvent) => {
-    // For this first step (within-lane only), keep this as a no-op.
-    // Cross-lane movement will be implemented later here.
+  const ideaDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over || !kanban) return;
+
+    const activeData = getDragData(active);
+    const overData = getDragData(over);
+
+    if (!isIdeaDrag(activeData)) return;
+
+    const activeId = active.id as string;
+    const activeLaneId = activeData!.swimlaneId!;
+    const targetLaneId = getTargetLaneId(overData, over.id as string);
+
+    if (!targetLaneId || activeLaneId === targetLaneId) return;
+
+    setKanban((prev) => {
+      if (!prev) return prev;
+
+      const targetLane = findLaneById(prev, targetLaneId);
+      if (!targetLane || isAlreadyInLane(targetLane, activeId)) return prev;
+
+      let insertIndex = targetLane.ideas.length;
+      if (overData?.type === "idea") {
+        const overIndex = findIdeaIndex(targetLane, over.id as string);
+        if (overIndex !== -1) insertIndex = overIndex;
+      }
+
+      const result = moveIdeaBetweenLanes(
+        prev,
+        activeId,
+        activeLaneId,
+        targetLaneId,
+        insertIndex
+      );
+
+      return result?.kanban ?? prev;
+    });
+
+    activeData!.swimlaneId = targetLaneId;
   };
 
   const ideaDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-
-    if (!over || !kanban) {
-      setActiveIdeaId(null);
-      return;
-    }
-
-    const activeData = active.data.current as {
-      type?: string;
-      swimlaneId?: string;
-    } | null;
-    const overData = over.data.current as { swimlaneId?: string } | null;
-
-    // Only handle ideas, and only when dropped within the same lane
-    if (!activeData || activeData.type !== "idea") {
-      setActiveIdeaId(null);
-      return;
-    }
-    if (!overData || overData.swimlaneId !== activeData.swimlaneId) {
-      setActiveIdeaId(null);
-      return;
-    }
-
-    const laneId = activeData.swimlaneId;
-    const lane = kanban.swimlanes.find((s) => s.id === laneId);
-    if (!lane) {
-      setActiveIdeaId(null);
-      return;
-    }
-
-    const oldIndex = lane.ideas.findIndex((i) => i.id === active.id);
-    const newIndex = lane.ideas.findIndex((i) => i.id === over.id);
-    if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) {
-      setActiveIdeaId(null);
-      return;
-    }
-
-    const newIdeas = arrayMove(lane.ideas, oldIndex, newIndex);
-    const newIdeaItemOrder = newIdeas.map((i) => i.id);
-
-    // Update local state synchronously - this makes drop animation work!
-    setKanban({
-      ...kanban,
-      swimlanes: kanban.swimlanes.map((s) =>
-        s.id === lane.id ? { ...s, ideas: newIdeas } : s
-      ),
-    });
+    const activeId = active.id as string;
 
     setActiveIdeaId(null);
 
-    // Persist to server, only allow sync after mutation completes
+    if (!kanban || !sourceLaneIdRef.current) {
+      stopDragging();
+      return;
+    }
+
+    const originalSourceLaneId = sourceLaneIdRef.current;
+    sourceLaneIdRef.current = null;
+
+    const currentLane = findLaneContainingIdea(kanban, activeId);
+    if (!currentLane) {
+      stopDragging();
+      return;
+    }
+
+    const laneChanged = originalSourceLaneId !== currentLane.id;
+
+    if (laneChanged) {
+      handleCrossLaneEnd(activeId, currentLane.id, over);
+    } else {
+      handleSameLaneEnd(activeId, currentLane.id, over);
+    }
+  };
+
+  const handleCrossLaneEnd = (
+    activeId: string,
+    currentLaneId: string,
+    over: DragEndEvent["over"]
+  ) => {
+    if (over && over.id !== activeId) {
+      const overData = getDragData(over);
+      if (overData?.type === "idea" && kanban) {
+        const lane = findLaneById(kanban, currentLaneId);
+        if (lane) {
+          const oldIndex = findIdeaIndex(lane, activeId);
+          const newIndex = findIdeaIndex(lane, over.id as string);
+
+          if (!shouldSkipReorder(oldIndex, newIndex)) {
+            setKanban(
+              reorderIdeasInLane(kanban, currentLaneId, oldIndex, newIndex)
+            );
+          }
+        }
+      }
+    }
+
+    const finalLane = kanban ? findLaneContainingIdea(kanban, activeId) : null;
+    const newIndex = finalLane ? findIdeaIndex(finalLane, activeId) : 0;
+
+    moveIdea({
+      variables: {
+        id: activeId,
+        targetSwimlaneId: currentLaneId,
+        newIndex,
+      },
+    })
+      .then(() => stopDragging())
+      .catch(() => {
+        stopDragging();
+        refetch();
+      });
+  };
+
+  const handleSameLaneEnd = (
+    activeId: string,
+    currentLaneId: string,
+    over: DragEndEvent["over"]
+  ) => {
+    if (!over || over.id === activeId || !kanban) {
+      stopDragging();
+      return;
+    }
+
+    const lane = findLaneById(kanban, currentLaneId);
+    if (!lane) {
+      stopDragging();
+      return;
+    }
+
+    const oldIndex = findIdeaIndex(lane, activeId);
+    const newIndex = findIdeaIndex(lane, over.id as string);
+
+    if (shouldSkipReorder(oldIndex, newIndex)) {
+      stopDragging();
+      return;
+    }
+
+    const updatedKanban = reorderIdeasInLane(
+      kanban,
+      currentLaneId,
+      oldIndex,
+      newIndex
+    );
+    const newIdeaItemOrder = findLaneById(
+      updatedKanban,
+      currentLaneId
+    )!.ideas.map((i) => i.id);
+
+    setKanban(updatedKanban);
+
     updateIdeaOrder({
-      variables: { swimlaneId: lane.id, ideaItemOrder: newIdeaItemOrder },
+      variables: {
+        swimlaneId: currentLaneId,
+        ideaItemOrder: newIdeaItemOrder,
+      },
     })
       .then(() => stopDragging())
       .catch(() => {

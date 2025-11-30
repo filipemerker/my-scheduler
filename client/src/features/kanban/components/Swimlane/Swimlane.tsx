@@ -45,7 +45,7 @@ export function Swimlane({
     useSortable({
       id: swimlane.id,
       disabled: isDragOverlay,
-      data: { type: "lane" },
+      data: { type: "lane", swimlaneId: swimlane.id },
     });
 
   // Only apply transition while any drag is active, not after drop
