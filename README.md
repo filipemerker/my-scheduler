@@ -5,8 +5,8 @@ A minimal monorepo demonstrating GraphQL client-server integration with Apollo S
 ## Structure
 
 ```
-/server    - Apollo Server (Node + TypeScript)
-/client    - React app (Vite + TypeScript) with Apollo Client
+/server    - Apollo Server (TypeScript + Prisma + Mongo)
+/client    - React app (TypeScript + Radix + dnd-kit) with Apollo Client
 ```
 
 ## Iterations
@@ -40,3 +40,9 @@ Added full CRUD for swimlanes and ideas with proper modals. Created shared UI co
 Added basic drag and drop features with dnd-kit. Also, created a local kanban state specifically for sorting to solve async dnd issues.
 
 <img src="iterations/iteration---5.png" width="700" alt="Iteration 5" />
+
+### Iteration 6
+
+Implemented cross-lane sorting and refactored the `useIdeaReorder` hook to drastically simplify remapping logic.
+
+<img src="iterations/iteration---6.png" width="700" alt="Iteration 6" />
