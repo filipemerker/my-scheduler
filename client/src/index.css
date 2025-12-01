@@ -55,3 +55,23 @@ button {
 .dropdown-content [role="separator"] {
   margin: var(--space-2) 0;
 }
+
+.rt-SegmentedControlIndicator::before {
+  background-color: var(--indigo-4);
+  box-shadow: none;
+}
+
+.rt-SegmentedControlRoot button[data-state="on"] {
+  color: var(--indigo-11);
+  font-weight: var(--font-weight-bold);
+}
+
+.rt-SegmentedControlRoot button[data-state="on"] .viewIcon {
+  color: var(--indigo-11);
+  font-weight: var(--font-weight-bold);
+}
+
+.rt-SegmentedControlRoot {
+  background-color: white;
+  background-image: none;
+}

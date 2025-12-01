@@ -7,6 +7,9 @@
 
 .header {
   padding: calc(var(--space-4) + 2px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .title {
@@ -21,44 +24,6 @@
   background-color: var(--gray-6);
 }
 
-.board {
-  flex: 1;
-  display: flex;
-  gap: var(--space-4);
-  padding: var(--space-4);
-  overflow-x: auto;
-  align-items: flex-start;
-}
-
-.addColumnButton {
-  background: transparent;
-  border: none;
-  border-radius: var(--radius-3);
-  cursor: pointer;
-  color: var(--gray-12);
-  font-weight: var(--font-weight-medium);
-  padding: calc(var(--space-4) + 3px) var(--space-4);
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: var(--space-2);
-  min-width: 320px;
-  max-width: 320px;
-  height: fit-content;
-  font-size: var(--font-size-2);
-  transition: background-color 0.15s ease;
-}
-
-.addColumnButton:hover:not(:disabled) {
-  background: var(--gray-3);
-  color: var(--gray-12);
-}
-
-.addColumnButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .demoNotice {
   position: fixed;
   bottom: var(--space-4);
@@ -71,4 +36,21 @@
   margin-left: 2px;
   margin-top: -2px;
   vertical-align: middle;
+}
+
+.viewIcon {
+  margin-right: var(--space-1);
+}
+
+.viewIconContainer {
+  display: flex;
+  align-items: center;
+  font-weight: var(--font-weight-bold);
+  gap: var(--space-1);
+}
+
+.segmentedControlContainer {
+  border-radius: var(--radius-2);
+  border: 1px solid var(--gray-6);
+  padding: var(--space-1);
 }
