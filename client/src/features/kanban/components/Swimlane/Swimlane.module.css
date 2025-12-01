@@ -5,7 +5,7 @@
   max-width: 320px;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 110px);
 }
 
 /* Placeholder shown where the dragged item came from */
@@ -14,7 +14,7 @@
   border-radius: var(--radius-3);
   min-width: 320px;
   max-width: 320px;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 110px);
 }
 
 /* The actual dragged overlay */
