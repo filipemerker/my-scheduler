@@ -39,3 +39,19 @@ button {
   transition: background-color 0.2s ease, border-color 0.2s ease,
     box-shadow 0.2s ease !important;
 }
+
+/* Dropdown content styles - moved from CSS module for production compatibility */
+.dropdown-content {
+  border-radius: var(--radius-2);
+  min-width: 180px;
+  font-weight: 600;
+}
+
+.dropdown-content [data-radix-collection-item] {
+  cursor: pointer;
+  transition: background-color 200ms ease;
+}
+
+.dropdown-content [role="separator"] {
+  margin: var(--space-2) 0;
+}

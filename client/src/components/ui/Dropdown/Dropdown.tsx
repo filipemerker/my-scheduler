@@ -1,5 +1,4 @@
 import { DropdownMenu } from "@radix-ui/themes";
-import "./Dropdown.module.css";
 
 interface DropdownContentProps {
   children: React.ReactNode;
@@ -7,11 +6,7 @@ interface DropdownContentProps {
 
 export function DropdownContent({ children }: DropdownContentProps) {
   return (
-    <DropdownMenu.Content
-      variant="soft"
-      size="2"
-      className="dropdown-content"
-    >
+    <DropdownMenu.Content variant="soft" size="2" className="dropdown-content">
       {children}
     </DropdownMenu.Content>
   );
