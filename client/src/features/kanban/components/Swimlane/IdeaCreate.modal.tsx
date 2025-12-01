@@ -59,6 +59,7 @@ export function IdeaCreateModal({
               placeholder="Enter idea name..."
               autoFocus
               disabled={loading}
+              maxLength={500}
             />
           </Flex>
 

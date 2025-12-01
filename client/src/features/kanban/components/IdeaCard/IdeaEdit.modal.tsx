@@ -60,6 +60,7 @@ export function IdeaEditModal({
               placeholder="Enter idea name..."
               autoFocus
               disabled={loading}
+              maxLength={500}
             />
           </Flex>
 

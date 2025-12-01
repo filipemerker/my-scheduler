@@ -3,6 +3,11 @@ import type { GraphQLContext } from "../../context";
 // Valid MongoDB ObjectId (24-char hex) for the singleton kanban board
 const KANBAN_ID = "000000000000000000000001";
 
+// Limits
+const MAX_CHARS = 500;
+const MAX_IDEAS_PER_LANE = 50;
+const MAX_LANES = 10;
+
 export const KanbanService = {
   // Queries
   getOrCreateKanban: ({ prisma }: GraphQLContext) =>
@@ -25,8 +30,13 @@ export const KanbanService = {
   // Swimlane mutations
   createSwimlane: ({ prisma }: GraphQLContext, name: string) =>
     prisma.$transaction(async (tx) => {
+      const kanban = await tx.kanban.findUnique({ where: { id: KANBAN_ID } });
+      if (kanban && kanban.swimlaneOrder.length >= MAX_LANES) {
+        throw new Error(`Maximum of ${MAX_LANES} groups allowed`);
+      }
+
       const swimlane = await tx.swimlane.create({
-        data: { name, ideaItemOrder: [] },
+        data: { name: name.slice(0, MAX_CHARS), ideaItemOrder: [] },
       });
 
       await tx.kanban.upsert({
@@ -41,7 +51,7 @@ export const KanbanService = {
   updateSwimlane: ({ prisma }: GraphQLContext, id: string, name?: string) =>
     prisma.swimlane.update({
       where: { id },
-      data: { ...(name && { name }) },
+      data: { ...(name && { name: name.slice(0, MAX_CHARS) }) },
     }),
 
   deleteSwimlane: ({ prisma }: GraphQLContext, id: string) =>
@@ -77,8 +87,22 @@ export const KanbanService = {
     description?: string
   ) =>
     prisma.$transaction(async (tx) => {
+      const swimlane = await tx.swimlane.findUnique({
+        where: { id: swimlaneId },
+        select: { ideaItemOrder: true },
+      });
+      if (swimlane && swimlane.ideaItemOrder.length >= MAX_IDEAS_PER_LANE) {
+        throw new Error(
+          `Maximum of ${MAX_IDEAS_PER_LANE} ideas per group allowed`
+        );
+      }
+
       const idea = await tx.idea.create({
-        data: { name, description, swimlaneId },
+        data: {
+          name: name.slice(0, MAX_CHARS),
+          description: description?.slice(0, MAX_CHARS),
+          swimlaneId,
+        },
       });
 
       await tx.swimlane.update({
@@ -98,8 +122,10 @@ export const KanbanService = {
     prisma.idea.update({
       where: { id },
       data: {
-        ...(name && { name }),
-        ...(description !== undefined && { description }),
+        ...(name && { name: name.slice(0, MAX_CHARS) }),
+        ...(description !== undefined && {
+          description: description?.slice(0, MAX_CHARS),
+        }),
       },
     }),
 

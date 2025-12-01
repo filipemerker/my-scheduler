@@ -65,6 +65,8 @@ export function Swimlane({
   const classNames = [styles.swimlane];
   if (isDragOverlay) classNames.push(styles.dragOverlay);
 
+  const isIdeaLimitReached = swimlane.ideas.length >= 50;
+
   return (
     <div ref={setNodeRef} style={style} className={classNames.join(" ")}>
       <div className={styles.header} {...attributes} {...listeners}>
@@ -79,6 +81,7 @@ export function Swimlane({
           variant="ghost"
           color="gray"
           size="1"
+          disabled={isIdeaLimitReached}
           onClick={(e) => {
             e.stopPropagation();
             setIdeaDialogOpen(true);
@@ -150,6 +153,7 @@ export function Swimlane({
           className={styles.newIdeaButton}
           variant="ghost"
           color="gray"
+          disabled={isIdeaLimitReached}
           onClick={() => setIdeaDialogOpen(true)}
         >
           <Plus size={16} />

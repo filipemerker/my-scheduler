@@ -49,7 +49,26 @@
   transition: background-color 0.15s ease;
 }
 
-.addColumnButton:hover {
+.addColumnButton:hover:not(:disabled) {
   background: var(--gray-3);
   color: var(--gray-12);
+}
+
+.addColumnButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.demoNotice {
+  position: fixed;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  max-width: 320px;
+  z-index: 100;
+}
+
+.externalLink {
+  margin-left: 2px;
+  margin-top: -2px;
+  vertical-align: middle;
 }

@@ -62,6 +62,7 @@ export function SwimlaneEditModal({
               placeholder="Enter group name..."
               autoFocus
               disabled={loading}
+              maxLength={500}
             />
           </Flex>
 

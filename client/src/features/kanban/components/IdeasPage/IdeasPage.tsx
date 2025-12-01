@@ -19,7 +19,8 @@ import {
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import * as Separator from "@radix-ui/react-separator";
-import { Plus } from "lucide-react";
+import { Box, Text, Link } from "@radix-ui/themes";
+import { ArrowUpRight, Plus } from "lucide-react";
 import { GET_KANBAN } from "../../api/queries";
 import type { GetKanbanData } from "../../types";
 import { useSwimlaneReorder } from "../../hooks/useSwimlaneReorder";
@@ -128,6 +129,7 @@ export function IdeasPage() {
     : null;
 
   const isAnyDragging = activeId !== null || activeIdeaId !== null;
+  const isLaneLimitReached = swimlanes.length >= 10;
 
   return (
     <div className={styles.page}>
@@ -161,6 +163,7 @@ export function IdeasPage() {
 
             <button
               className={styles.addColumnButton}
+              disabled={isLaneLimitReached}
               onClick={() => setCreateDialogOpen(true)}
             >
               <Plus size={18} />
@@ -185,6 +188,21 @@ export function IdeasPage() {
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
       />
+
+      <Box p="2" className={styles.demoNotice}>
+        <Text as="p" size="2" color="gray">
+          This temporary demo was created by{" "}
+          <Link href="https://filipemerker.github.io/" target="_blank">
+            Philip
+            <ArrowUpRight size={13} className={styles.externalLink} />
+          </Link>
+        </Text>
+        <Text as="p" size="1" color="gray" mt="2">
+          Content present on the board is not mine and can be edited by anyone
+          with access to this page without moderation. Feel free to respectfuly
+          mess around ❤️.
+        </Text>
+      </Box>
     </div>
   );
 }
