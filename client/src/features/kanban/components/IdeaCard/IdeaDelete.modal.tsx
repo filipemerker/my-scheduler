@@ -8,13 +8,16 @@ import {
   AlertDialogDescription,
 } from "../../../../components/ui/Dialog";
 import { DELETE_IDEA } from "../../api/mutations";
-import { GET_KANBAN } from "../../api/queries";
+import { deleteLocalIdea } from "../../hooks/useLocalKanban.utils";
+import type { Kanban } from "../../types";
 
 interface IdeaDeleteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   ideaId: string;
   ideaName: string;
+  kanban: Kanban;
+  setKanban: (kanban: Kanban) => void;
 }
 
 export function IdeaDeleteModal({
@@ -22,15 +25,17 @@ export function IdeaDeleteModal({
   onOpenChange,
   ideaId,
   ideaName,
+  kanban,
+  setKanban,
 }: IdeaDeleteModalProps) {
-  const [deleteIdea, { loading }] = useMutation(DELETE_IDEA, {
-    refetchQueries: [{ query: GET_KANBAN }],
-    onCompleted: () => onOpenChange(false),
-  });
+  const [deleteIdea, { loading }] = useMutation(DELETE_IDEA);
 
   const handleDelete = () => {
     if (loading) return;
+
+    setKanban(deleteLocalIdea(kanban, ideaId));
     deleteIdea({ variables: { id: ideaId } });
+    onOpenChange(false);
   };
 
   return (

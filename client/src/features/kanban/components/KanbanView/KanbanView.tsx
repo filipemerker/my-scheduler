@@ -35,35 +35,20 @@ const dropAnimation: DropAnimation = {
 interface KanbanViewProps {
   kanban: Kanban;
   setKanban: React.Dispatch<React.SetStateAction<Kanban | null>>;
-  startDragging: () => void;
-  stopDragging: () => void;
-  refetch: () => void;
 }
 
-export function KanbanView({
-  kanban,
-  setKanban,
-  startDragging,
-  stopDragging,
-  refetch,
-}: KanbanViewProps) {
+export function KanbanView({ kanban, setKanban }: KanbanViewProps) {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const { activeId, swimlaneDragStart, swimlaneDragEnd } = useSwimlaneReorder({
     kanban,
     setKanban,
-    startDragging,
-    stopDragging,
-    refetch,
   });
 
   const { activeIdeaId, ideaDragStart, ideaDragOver, ideaDragEnd } =
     useIdeaReorder({
       kanban,
       setKanban,
-      startDragging,
-      stopDragging,
-      refetch,
     });
 
   const sensors = useSensors(
@@ -127,6 +112,8 @@ export function KanbanView({
                 swimlane={swimlane}
                 isPlaceholder={swimlane.id === activeId}
                 isAnyDragging={isAnyDragging}
+                kanban={kanban}
+                setKanban={setKanban}
               />
             ))}
 
@@ -146,7 +133,12 @@ export function KanbanView({
           modifiers={[restrictToLaneAxis]}
         >
           {activeSwimlane && (
-            <Swimlane swimlane={activeSwimlane} isDragOverlay />
+            <Swimlane
+              swimlane={activeSwimlane}
+              isDragOverlay
+              kanban={kanban}
+              setKanban={setKanban}
+            />
           )}
           {activeIdea && <IdeaCardPreview idea={activeIdea} />}
         </DragOverlay>
@@ -155,8 +147,9 @@ export function KanbanView({
       <SwimlaneCreateModal
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
+        kanban={kanban}
+        setKanban={setKanban}
       />
     </>
   );
 }
-

@@ -8,13 +8,18 @@ import {
   DropdownItem,
   DropdownSeparator,
 } from "../../../../components/ui/Dropdown";
-import type { Idea, Swimlane } from "../../types";
+import type { Idea, Swimlane, Kanban } from "../../types";
 import { IdeaEditModal } from "../IdeaCard/IdeaEdit.modal";
 import { IdeaDeleteModal } from "../IdeaCard/IdeaDelete.modal";
 import styles from "./GalleryView.module.css";
 
+interface GalleryCardProps {
+  idea: Idea;
+  kanban: Kanban;
+  setKanban: (kanban: Kanban) => void;
+}
 
-function GalleryCard({ idea }: { idea: Idea }) {
+function GalleryCard({ idea, kanban, setKanban }: GalleryCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -62,6 +67,8 @@ function GalleryCard({ idea }: { idea: Idea }) {
         onOpenChange={setRenameDialogOpen}
         ideaId={idea.id}
         currentName={idea.name}
+        kanban={kanban}
+        setKanban={setKanban}
       />
 
       <IdeaDeleteModal
@@ -69,6 +76,8 @@ function GalleryCard({ idea }: { idea: Idea }) {
         onOpenChange={setDeleteDialogOpen}
         ideaId={idea.id}
         ideaName={idea.name}
+        kanban={kanban}
+        setKanban={setKanban}
       />
     </Box>
   );
@@ -76,9 +85,15 @@ function GalleryCard({ idea }: { idea: Idea }) {
 
 interface GalleryViewProps {
   swimlanes: Swimlane[];
+  kanban: Kanban;
+  setKanban: (kanban: Kanban) => void;
 }
 
-export function GalleryView({ swimlanes }: GalleryViewProps) {
+export function GalleryView({
+  swimlanes,
+  kanban,
+  setKanban,
+}: GalleryViewProps) {
   // Flatten all ideas
   const allIdeas = swimlanes.flatMap((swimlane) => swimlane.ideas);
 
@@ -95,9 +110,13 @@ export function GalleryView({ swimlanes }: GalleryViewProps) {
   return (
     <div className={styles.gallery}>
       {allIdeas.map((idea) => (
-        <GalleryCard key={idea.id} idea={idea} />
+        <GalleryCard
+          key={idea.id}
+          idea={idea}
+          kanban={kanban}
+          setKanban={setKanban}
+        />
       ))}
     </div>
   );
 }
-

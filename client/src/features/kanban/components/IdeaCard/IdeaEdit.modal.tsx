@@ -9,13 +9,16 @@ import {
   DialogClose,
 } from "../../../../components/ui/Dialog";
 import { UPDATE_IDEA } from "../../api/mutations";
-import { GET_KANBAN } from "../../api/queries";
+import { renameLocalIdea } from "../../hooks/useLocalKanban.utils";
+import type { Kanban } from "../../types";
 
 interface IdeaEditModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   ideaId: string;
   currentName: string;
+  kanban: Kanban;
+  setKanban: (kanban: Kanban) => void;
 }
 
 export function IdeaEditModal({
@@ -23,22 +26,23 @@ export function IdeaEditModal({
   onOpenChange,
   ideaId,
   currentName,
+  kanban,
+  setKanban,
 }: IdeaEditModalProps) {
   const [name, setName] = useState(currentName);
+  const [updateIdea, { loading }] = useMutation(UPDATE_IDEA);
 
   useEffect(() => {
     if (open) setName(currentName);
   }, [open, currentName]);
 
-  const [updateIdea, { loading }] = useMutation(UPDATE_IDEA, {
-    refetchQueries: [{ query: GET_KANBAN }],
-    onCompleted: () => onOpenChange(false),
-  });
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || name === currentName || loading) return;
+
+    setKanban(renameLocalIdea(kanban, ideaId, name));
     updateIdea({ variables: { id: ideaId, name } });
+    onOpenChange(false);
   };
 
   return (

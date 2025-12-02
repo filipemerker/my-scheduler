@@ -10,7 +10,7 @@ import {
   DropdownItem,
   DropdownSeparator,
 } from "../../../../components/ui/Dropdown";
-import type { Idea } from "../../types";
+import type { Idea, Kanban } from "../../types";
 import { IdeaEditModal } from "./IdeaEdit.modal";
 import { IdeaDeleteModal } from "./IdeaDelete.modal";
 import styles from "./IdeaCard.module.css";
@@ -44,9 +44,11 @@ export function IdeaCardPreview({ idea }: IdeaCardPreviewProps) {
 interface IdeaCardProps {
   idea: Idea;
   swimlaneId: string;
+  kanban: Kanban;
+  setKanban: (kanban: Kanban | ((prev: Kanban | null) => Kanban | null)) => void;
 }
 
-export function IdeaCard({ idea, swimlaneId }: IdeaCardProps) {
+export function IdeaCard({ idea, swimlaneId, kanban, setKanban }: IdeaCardProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -124,6 +126,8 @@ export function IdeaCard({ idea, swimlaneId }: IdeaCardProps) {
         onOpenChange={setRenameDialogOpen}
         ideaId={idea.id}
         currentName={idea.name}
+        kanban={kanban}
+        setKanban={setKanban}
       />
 
       <IdeaDeleteModal
@@ -131,6 +135,8 @@ export function IdeaCard({ idea, swimlaneId }: IdeaCardProps) {
         onOpenChange={setDeleteDialogOpen}
         ideaId={idea.id}
         ideaName={idea.name}
+        kanban={kanban}
+        setKanban={setKanban}
       />
     </Box>
   );

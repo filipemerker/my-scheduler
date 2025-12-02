@@ -9,33 +9,46 @@ import {
   DialogClose,
 } from "../../../../components/ui/Dialog";
 import { CREATE_IDEA } from "../../api/mutations";
-import { GET_KANBAN } from "../../api/queries";
+import { createLocalIdea } from "../../hooks/useLocalKanban.utils";
+import type { Kanban, Idea, CreateIdeaData } from "../../types";
 
 interface IdeaCreateModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   swimlaneId: string;
+  kanban: Kanban;
+  setKanban: (kanban: Kanban) => void;
 }
 
 export function IdeaCreateModal({
   open,
   onOpenChange,
   swimlaneId,
+  kanban,
+  setKanban,
 }: IdeaCreateModalProps) {
   const [name, setName] = useState("");
-
-  const [createIdea, { loading }] = useMutation(CREATE_IDEA, {
-    refetchQueries: [{ query: GET_KANBAN }],
-    onCompleted: () => {
-      setName("");
-      onOpenChange(false);
-    },
-  });
+  const [createIdea, { loading }] = useMutation<CreateIdeaData>(CREATE_IDEA);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || loading) return;
-    createIdea({ variables: { name, swimlaneId } });
+
+    createIdea({ variables: { name, swimlaneId } }).then((response) => {
+      if (!response.data) return;
+
+      const newIdea: Idea = {
+        id: response.data.createIdea.id,
+        name: response.data.createIdea.name,
+        description: response.data.createIdea.description,
+        swimlaneId: response.data.createIdea.swimlaneId,
+        createdAt: new Date().toISOString(),
+      };
+
+      setKanban(createLocalIdea(kanban, swimlaneId, newIdea));
+      setName("");
+      onOpenChange(false);
+    });
   };
 
   return (

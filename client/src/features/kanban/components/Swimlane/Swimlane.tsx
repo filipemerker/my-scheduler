@@ -17,7 +17,7 @@ import {
   DropdownItem,
   DropdownSeparator,
 } from "../../../../components/ui/Dropdown";
-import type { Swimlane as SwimlaneType } from "../../types";
+import type { Swimlane as SwimlaneType, Kanban } from "../../types";
 import { IdeaCard } from "../IdeaCard/IdeaCard";
 import { IdeaCreateModal } from "./IdeaCreate.modal";
 import { SwimlaneEditModal } from "./SwimlaneEdit.modal";
@@ -29,6 +29,8 @@ interface SwimlaneProps {
   isPlaceholder?: boolean;
   isDragOverlay?: boolean;
   isAnyDragging?: boolean;
+  kanban: Kanban;
+  setKanban: (kanban: Kanban | ((prev: Kanban | null) => Kanban | null)) => void;
 }
 
 export function Swimlane({
@@ -36,6 +38,8 @@ export function Swimlane({
   isPlaceholder = false,
   isDragOverlay = false,
   isAnyDragging = false,
+  kanban,
+  setKanban,
 }: SwimlaneProps) {
   const [ideaDialogOpen, setIdeaDialogOpen] = useState(false);
   const [renameDialogOpen, setRenameDialogOpen] = useState(false);
@@ -123,6 +127,8 @@ export function Swimlane({
           onOpenChange={setRenameDialogOpen}
           swimlaneId={swimlane.id}
           currentName={swimlane.name}
+          kanban={kanban}
+          setKanban={setKanban}
         />
 
         <SwimlaneDeleteModal
@@ -130,12 +136,16 @@ export function Swimlane({
           onOpenChange={setDeleteDialogOpen}
           swimlaneId={swimlane.id}
           swimlaneName={swimlane.name}
+          kanban={kanban}
+          setKanban={setKanban}
         />
 
         <IdeaCreateModal
           open={ideaDialogOpen}
           onOpenChange={setIdeaDialogOpen}
           swimlaneId={swimlane.id}
+          kanban={kanban}
+          setKanban={setKanban}
         />
       </div>
 
@@ -145,7 +155,13 @@ export function Swimlane({
           strategy={verticalListSortingStrategy}
         >
           {swimlane.ideas.map((idea) => (
-            <IdeaCard key={idea.id} idea={idea} swimlaneId={swimlane.id} />
+            <IdeaCard
+              key={idea.id}
+              idea={idea}
+              swimlaneId={swimlane.id}
+              kanban={kanban}
+              setKanban={setKanban}
+            />
           ))}
         </SortableContext>
 

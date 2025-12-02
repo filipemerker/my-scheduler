@@ -14,12 +14,10 @@ import styles from "./IdeasPage.module.css";
 type ViewMode = "board" | "gallery";
 
 export function IdeasPage() {
-  const { data, loading, refetch } = useQuery<GetKanbanData>(GET_KANBAN);
+  const { data, loading } = useQuery<GetKanbanData>(GET_KANBAN);
   const [viewMode, setViewMode] = useState<ViewMode>("board");
 
-  const { kanban, setKanban, startDragging, stopDragging } = useLocalKanban(
-    data?.kanban
-  );
+  const { kanban, setKanban } = useLocalKanban(data?.kanban);
 
   return (
     <div className={styles.page}>
@@ -54,15 +52,13 @@ export function IdeasPage() {
       {loading || !kanban ? (
         <KanbanSkeleton />
       ) : viewMode === "gallery" ? (
-        <GalleryView swimlanes={kanban.swimlanes} />
-      ) : (
-        <KanbanView
+        <GalleryView
+          swimlanes={kanban.swimlanes}
           kanban={kanban}
           setKanban={setKanban}
-          startDragging={startDragging}
-          stopDragging={stopDragging}
-          refetch={refetch}
         />
+      ) : (
+        <KanbanView kanban={kanban} setKanban={setKanban} />
       )}
 
       <Box p="2" className={styles.demoNotice}>

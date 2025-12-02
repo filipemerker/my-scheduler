@@ -25,18 +25,9 @@ interface UseIdeaReorderProps {
   setKanban: (
     kanban: Kanban | ((prev: Kanban | null) => Kanban | null)
   ) => void;
-  startDragging: () => void;
-  stopDragging: () => void;
-  refetch: () => void;
 }
 
-export function useIdeaReorder({
-  kanban,
-  setKanban,
-  startDragging,
-  stopDragging,
-  refetch,
-}: UseIdeaReorderProps) {
+export function useIdeaReorder({ kanban, setKanban }: UseIdeaReorderProps) {
   const [updateIdeaOrder] = useMutation(UPDATE_IDEA_ORDER);
   const [moveIdea] = useMutation(MOVE_IDEA);
   const [activeIdeaId, setActiveIdeaId] = useState<string | null>(null);
@@ -46,7 +37,6 @@ export function useIdeaReorder({
     const data = getDragData(event.active);
     if (!isIdeaDrag(data)) return;
 
-    startDragging();
     setActiveIdeaId(event.active.id as string);
     sourceLaneIdRef.current = data!.swimlaneId!;
   };
@@ -98,19 +88,13 @@ export function useIdeaReorder({
 
     setActiveIdeaId(null);
 
-    if (!kanban || !sourceLaneIdRef.current) {
-      stopDragging();
-      return;
-    }
+    if (!kanban || !sourceLaneIdRef.current) return;
 
     const originalSourceLaneId = sourceLaneIdRef.current;
     sourceLaneIdRef.current = null;
 
     const currentLane = findLaneContainingIdea(kanban, activeId);
-    if (!currentLane) {
-      stopDragging();
-      return;
-    }
+    if (!currentLane) return;
 
     const laneChanged = originalSourceLaneId !== currentLane.id;
 
@@ -152,12 +136,7 @@ export function useIdeaReorder({
         targetSwimlaneId: currentLaneId,
         newIndex,
       },
-    })
-      .then(() => stopDragging())
-      .catch(() => {
-        stopDragging();
-        refetch();
-      });
+    });
   };
 
   const handleSameLaneEnd = (
@@ -165,24 +144,15 @@ export function useIdeaReorder({
     currentLaneId: string,
     over: DragEndEvent["over"]
   ) => {
-    if (!over || over.id === activeId || !kanban) {
-      stopDragging();
-      return;
-    }
+    if (!over || over.id === activeId || !kanban) return;
 
     const lane = findLaneById(kanban, currentLaneId);
-    if (!lane) {
-      stopDragging();
-      return;
-    }
+    if (!lane) return;
 
     const oldIndex = findIdeaIndex(lane, activeId);
     const newIndex = findIdeaIndex(lane, over.id as string);
 
-    if (shouldSkipReorder(oldIndex, newIndex)) {
-      stopDragging();
-      return;
-    }
+    if (shouldSkipReorder(oldIndex, newIndex)) return;
 
     const updatedKanban = reorderIdeasInLane(
       kanban,
@@ -202,12 +172,7 @@ export function useIdeaReorder({
         swimlaneId: currentLaneId,
         ideaItemOrder: newIdeaItemOrder,
       },
-    })
-      .then(() => stopDragging())
-      .catch(() => {
-        stopDragging();
-        refetch();
-      });
+    });
   };
 
   return { activeIdeaId, ideaDragStart, ideaDragOver, ideaDragEnd };

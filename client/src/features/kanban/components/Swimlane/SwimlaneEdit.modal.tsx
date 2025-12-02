@@ -9,13 +9,16 @@ import {
   DialogClose,
 } from "../../../../components/ui/Dialog";
 import { UPDATE_SWIMLANE } from "../../api/mutations";
-import { GET_KANBAN } from "../../api/queries";
+import { renameLocalSwimlane } from "../../hooks/useLocalKanban.utils";
+import type { Kanban } from "../../types";
 
 interface SwimlaneEditModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   swimlaneId: string;
   currentName: string;
+  kanban: Kanban;
+  setKanban: (kanban: Kanban) => void;
 }
 
 export function SwimlaneEditModal({
@@ -23,22 +26,23 @@ export function SwimlaneEditModal({
   onOpenChange,
   swimlaneId,
   currentName,
+  kanban,
+  setKanban,
 }: SwimlaneEditModalProps) {
   const [name, setName] = useState(currentName);
+  const [updateSwimlane, { loading }] = useMutation(UPDATE_SWIMLANE);
 
   useEffect(() => {
     if (open) setName(currentName);
   }, [open, currentName]);
 
-  const [updateSwimlane, { loading }] = useMutation(UPDATE_SWIMLANE, {
-    refetchQueries: [{ query: GET_KANBAN }],
-    onCompleted: () => onOpenChange(false),
-  });
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim() || name === currentName || loading) return;
+
+    setKanban(renameLocalSwimlane(kanban, swimlaneId, name));
     updateSwimlane({ variables: { id: swimlaneId, name } });
+    onOpenChange(false);
   };
 
   return (

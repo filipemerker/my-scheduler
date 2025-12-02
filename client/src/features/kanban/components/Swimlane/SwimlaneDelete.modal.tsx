@@ -9,13 +9,16 @@ import {
   AlertDialogAction,
 } from "../../../../components/ui/Dialog";
 import { DELETE_SWIMLANE } from "../../api/mutations";
-import { GET_KANBAN } from "../../api/queries";
+import { deleteLocalSwimlane } from "../../hooks/useLocalKanban.utils";
+import type { Kanban } from "../../types";
 
 interface SwimlaneDeleteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   swimlaneId: string;
   swimlaneName: string;
+  kanban: Kanban;
+  setKanban: (kanban: Kanban) => void;
 }
 
 export function SwimlaneDeleteModal({
@@ -23,15 +26,17 @@ export function SwimlaneDeleteModal({
   onOpenChange,
   swimlaneId,
   swimlaneName,
+  kanban,
+  setKanban,
 }: SwimlaneDeleteModalProps) {
-  const [deleteSwimlane, { loading }] = useMutation(DELETE_SWIMLANE, {
-    refetchQueries: [{ query: GET_KANBAN }],
-    onCompleted: () => onOpenChange(false),
-  });
+  const [deleteSwimlane, { loading }] = useMutation(DELETE_SWIMLANE);
 
   const handleDelete = () => {
     if (loading) return;
+
+    setKanban(deleteLocalSwimlane(kanban, swimlaneId));
     deleteSwimlane({ variables: { id: swimlaneId } });
+    onOpenChange(false);
   };
 
   return (

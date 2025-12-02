@@ -1,28 +1,16 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { Kanban } from "../types";
 
 export function useLocalKanban(serverKanban: Kanban | null | undefined) {
-  const [localKanban, setLocalKanban] = useState<Kanban | null>(null);
-  const isDraggingRef = useRef(false);
+  const [kanban, setKanban] = useState<Kanban | null>(null);
+  const initialized = useRef(false);
 
   useEffect(() => {
-    if (serverKanban && !isDraggingRef.current) {
-      setLocalKanban(serverKanban);
+    if (serverKanban && !initialized.current) {
+      setKanban(serverKanban);
+      initialized.current = true;
     }
   }, [serverKanban]);
 
-  const startDragging = useCallback(() => {
-    isDraggingRef.current = true;
-  }, []);
-
-  const stopDragging = useCallback(() => {
-    isDraggingRef.current = false;
-  }, []);
-
-  return {
-    kanban: localKanban,
-    setKanban: setLocalKanban,
-    startDragging,
-    stopDragging,
-  };
+  return { kanban, setKanban };
 }
